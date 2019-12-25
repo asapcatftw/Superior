@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import discord
 from discord import utils, Client
@@ -49,7 +49,7 @@ async def on_ready():
 	game = discord.Game("Launchin zzz..")
 	await client.change_presence(status=discord.Status.idle, activity=game)
 	print("Launched sucessfully" + client.user.display_name)
-	game1 = discord.Game(f"@mention help | Listening to {len(client.users)}")
+	game1 = discord.Game("@mention help")
 	await client.change_presence(status=discord.Status.online, activity=game1)
 		
 @client.event
@@ -75,12 +75,14 @@ async def welcomer_help(ctx):
 @client.command()
 async def help(ctx):
 	embed = discord.Embed(color=discord.Color.dark_teal(), timestap=datetime.datetime.utcnow())
-	embed.add_field(name="General Commands", value="*ping | avatar | userinfo | guildinfo | welcomer | embed | bitcoin | serverstats | joined | uptime | botinfo*", inline=True)
+	embed.add_field(name="General Commands", value="*ping | avatar | userinfo | guildinfo | myinfo | welcomer | embed | bitcoin | serverstats | joined | uptime | botinfo*", inline=True)
 	embed.add_field(name="Mathematics Commands", value="*add | subtract | multiply | divide*", inline=True)
 	embed.add_field(name="Fun Commands", value="*meme | slap | mentionme | dice | toss | reverse | meow | hug*", inline=True)
 	embed.add_field(name="Search Commands", value="*google | youtube | yahoo*", inline=True)
 	embed.add_field(name="Action Commands", value="*ban | unban | kick | purge | mute | unmute | softban | nuke*", inline=True)
 	embed.add_field(name="Image Fun Commands", value="*calling | captcha | challenge | achievement | facts | scroll*")
+	embed.add_field(name="Text Fun Commands", value="*greentext | bluetext | echo | reverse | randomnum*")
+	embed.set_footer(text=f"Hey! {ctx.message.author} to view list of commands with defination visit http://www.devhubyt.xyz/Superior/commands.html")               
 	await ctx.send(embed=embed)
 	
 @client.command()
@@ -102,7 +104,7 @@ async def connect(ctx):
 @client.command()
 @commands.is_owner()
 async def stats(ctx):
-	await ctx.send(len(client.commands) + len(client.guilds) + len(client.users))
+	await ctx.send(f"Current commands: {len(client.commands)}, Guilds: {len(client.guilds)} and Used by {len(client.users)}")
 	
 @client.command()
 async def ping(ctx):
@@ -141,6 +143,17 @@ async def userinfo(ctx, member: discord.Member):
 	await ctx.send(embed=em)
 	
 @client.command()
+async def myinfo(ctx):
+	roles = [role for role in ctx.author.roles]
+	embed = discord.Embed(title=f"About {ctx.author}", color=discord.Color.dark_magenta())
+	embed.add_field(name="ID", value=f"{ctx.author.id}", inline=True)
+	embed.add_field(name="Joined at", value=ctx.author.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC"))
+	embed.add_field(name="Roles", value=" ".join([role.mention for role in roles]))
+	embed.add_field(name="Top Role", value=ctx.author.top_role.mention)
+	embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+	await ctx.send(embed=embed)
+	
+@client.command()
 async def guildinfo(ctx):
 	roles = [role for role in ctx.guild.roles]
 	guild_age = (ctx.message.created_at - ctx.author.guild.created_at).days
@@ -177,7 +190,10 @@ async def meow(ctx):
 		async with session.get('http://aws.random.cat/meow') as r:
 			if r.status == 200:
 				js = await r.json()
-				await ctx.send(js['file'])
+				url = js['file']
+				embed = discord.Embed(title="Here Come's", color=discord.Color.dark_green())
+				embed.set_image(url=url)
+				await ctx.send(embed=embed)
 			
 @client.command()
 async def botinfo(ctx):
@@ -189,7 +205,7 @@ async def botinfo(ctx):
 	embed.add_field(name="Commands Injected", value=len(client.commands))
 	embed.add_field(name="Platform", value=platform)
 	embed.add_field(name="Guilds", value=guilds)
-	embed.add_field(name="Used by", value=len(client.users))
+	embed.add_field(name="Used by", value=f"{len(client.users)} users")
 	await ctx.send(embed=embed)
 
 
@@ -232,12 +248,10 @@ async def meme(ctx):
 	async with aiohttp.ClientSession() as session:
 		async with session.get("https://api.reddit.com/r/me_irl/random") as r:
 			data = await r.json()
-			await ctx.send(data[0]["data"]["children"][0]["data"]["url"])
-			
-@client.command()
-async def reverse(ctx, *, message):
-	message = message.split()
-	await ctx.send(' '.join(reversed(message)))
+			url = data[0]["data"]["children"][0]["data"]["url"]
+			embed = discord.Embed(title="Here Come's meme", color=discord.Color.dark_green())
+			embed.set_image(url=url)
+			await ctx.send(embed=embed)
 	
 @client.command()
 async def slap(ctx, *, member: discord.Member = None):
@@ -259,9 +273,9 @@ async def hug(ctx, *, member: discord.Member = None):
 	if member is None:
 		await ctx.send(f"{ctx.message.author.mention} has been hugged 💝")
 	elif member.id == ctx.message.author.id:
-		await ctx.send(ctx.message.author.mention + "hugged themselves because they are singles 👬")
+		await ctx.send(f"{ctx.message.author.mention} hugged themselves because they are singles 👬")
 	else:
-		await ctx.send({member.mention} + "was hugged by" + ctx.message.author.mention + "💝")
+		await ctx.send(f"{member.mention} was hugged by {ctx.message.author.mention} 💝")
 		
 @client.command()
 async def google(ctx, *, search = None):
