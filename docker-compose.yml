@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  proxy:
+    image: cool2zap/superior-bot
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - superior:/app
+    environment:
+      - TOKEN=""
+
+volumes:
+  superior
+networks:
+  web:
