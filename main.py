@@ -21,7 +21,7 @@ import time
 from random import randrange
 
 client = commands.Bot(
-           command_prefix=commands.when_mentioned,
+           command_prefix="!",
            description="SuperiorBot",
            owner_id=650890049558282272,
            case_insensitive=True
